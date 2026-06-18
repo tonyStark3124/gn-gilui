@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="he-IL">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#000000">
+  <meta name="description" content="גן הגילוי — משחק חינוכי לילדים בגילאי שנה עד שלוש. כל מגע הוא גילוי.">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="favicon.svg">
+  <title>גן הגילוי | Little Wonders</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ===================== SPLASH SCREEN ===================== -->
+  <div id="splashScreen" role="status" aria-label="טוען את גן הגילוי">
+    <div class="splash-logo" aria-hidden="true">
+      <svg viewBox="0 0 120 120" width="140" height="140" xmlns="http://www.w3.org/2000/svg">
+        <!-- Palm of hand -->
+        <ellipse cx="60" cy="82" rx="28" ry="24" fill="#FFDAB9"/>
+        <!-- Thumb -->
+        <ellipse cx="28" cy="74" rx="9" ry="16" fill="#FFDAB9" transform="rotate(-25 28 74)"/>
+        <!-- Index finger -->
+        <ellipse cx="38" cy="45" rx="8" ry="22" fill="#FFDAB9" transform="rotate(-8 38 45)"/>
+        <!-- Middle finger -->
+        <ellipse cx="56" cy="38" rx="8" ry="25" fill="#FFDAB9" transform="rotate(0 56 38)"/>
+        <!-- Ring finger -->
+        <ellipse cx="74" cy="40" rx="7.5" ry="23" fill="#FFDAB9" transform="rotate(8 74 40)"/>
+        <!-- Pinky -->
+        <ellipse cx="90" cy="50" rx="7" ry="18" fill="#FFDAB9" transform="rotate(18 90 50)"/>
+        <!-- Stars on fingertips -->
+        <text x="32" y="27" font-size="18" text-anchor="middle" fill="#FF6B6B">★</text>
+        <text x="50" y="16" font-size="20" text-anchor="middle" fill="#FFC947">★</text>
+        <text x="68" y="14" font-size="22" text-anchor="middle" fill="#87CEEB">★</text>
+        <text x="85" y="22" font-size="18" text-anchor="middle" fill="#DDA0DD">★</text>
+        <text x="14" y="60" font-size="16" text-anchor="middle" fill="#BFFFB5">★</text>
+      </svg>
+    </div>
+    <h1 class="splash-title" lang="he">גן הגילוי</h1>
+    <p class="splash-subtitle" lang="en">Little Wonders</p>
+    <p class="splash-tagline" lang="he">כל מגע הוא גילוי</p>
+    <div class="splash-dots" aria-hidden="true">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+
+  <!-- ===================== GAME CANVAS ===================== -->
+  <canvas id="gameCanvas"></canvas>
+
+  <!-- Gear button — small, non-toy appearance -->
+  <button id="gearBtn" aria-label="הגדרות הורים / Parent settings" tabindex="-1">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="rgba(255,255,255,0.75)" aria-hidden="true">
+      <path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65a.5.5 0 0 0 .12-.64l-2-3.46a.5.5 0 0 0-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65A.49.49 0 0 0 14 2h-4a.49.49 0 0 0-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1a.49.49 0 0 0-.61.22l-2 3.46a.48.48 0 0 0 .12.64l2.11 1.65A7.16 7.16 0 0 0 5 12c0 .34.02.65.06.98l-2.11 1.65a.48.48 0 0 0-.12.64l2 3.46c.12.22.37.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.06.24.28.42.49.42h4c.24 0 .44-.17.49-.42l.38-2.65c.61-.25 1.17-.58 1.69-.98l2.49 1c.24.09.49 0 .61-.22l2-3.46a.48.48 0 0 0-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/>
+    </svg>
+  </button>
+
+  <!-- Wind-down visual overlay -->
+  <div id="windDownOverlay" aria-hidden="true"></div>
+
+  <!-- Value card — shown between mini-game transitions -->
+  <div id="valueCard" aria-live="polite" aria-atomic="true" role="status">
+    <div class="value-icon" aria-hidden="true"></div>
+    <p class="value-he" lang="he"></p>
+    <p class="value-en" lang="en"></p>
+  </div>
+
+  <!-- Celebration overlay — fireworks only, no text -->
+  <div id="celebration" aria-hidden="true"></div>
+
+  <!-- Pause overlay -->
+  <div id="pauseOverlay" style="display:none" aria-label="משחק מושהה" role="status">
+    <div class="pause-icon">⏸</div>
+  </div>
+
+  <!-- Sleep screen -->
+  <div id="sleepScreen" aria-label="זמן שינה" role="img">
+    <svg class="breathe" viewBox="0 0 220 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ארנב ישן">
+      <ellipse cx="75" cy="68" rx="20" ry="52" fill="#c8a8d8" transform="rotate(-12 75 68)"/>
+      <ellipse cx="75" cy="70" rx="11" ry="38" fill="#f4bfcf" transform="rotate(-12 75 70)"/>
+      <ellipse cx="145" cy="68" rx="20" ry="52" fill="#c8a8d8" transform="rotate(12 145 68)"/>
+      <ellipse cx="145" cy="70" rx="11" ry="38" fill="#f4bfcf" transform="rotate(12 145 70)"/>
+      <ellipse cx="110" cy="178" rx="60" ry="58" fill="#dcc8ec"/>
+      <circle cx="110" cy="118" r="52" fill="#dcc8ec"/>
+      <path d="M88 115 Q96 109 104 115" stroke="#7a5c9a" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <path d="M116 115 Q124 109 132 115" stroke="#7a5c9a" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <line x1="91" y1="114" x2="89" y2="110" stroke="#7a5c9a" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="101" y1="111" x2="101" y2="107" stroke="#7a5c9a" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="119" y1="114" x2="119" y2="110" stroke="#7a5c9a" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="129" y1="111" x2="131" y2="107" stroke="#7a5c9a" stroke-width="1.5" stroke-linecap="round"/>
+      <ellipse cx="110" cy="130" rx="6" ry="4" fill="#f4bfcf"/>
+      <path d="M103 137 Q110 144 117 137" stroke="#7a5c9a" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+      <ellipse cx="89" cy="132" rx="12" ry="7" fill="rgba(255,140,140,0.28)"/>
+      <ellipse cx="131" cy="132" rx="12" ry="7" fill="rgba(255,140,140,0.28)"/>
+      <text class="zzz1" x="158" y="105" font-size="20" fill="#c8a8d8" font-family="Georgia,serif" font-style="italic" font-weight="bold">z</text>
+      <text class="zzz2" x="172" y="88" font-size="26" fill="#c8a8d8" font-family="Georgia,serif" font-style="italic" font-weight="bold">z</text>
+      <text class="zzz3" x="190" y="68" font-size="32" fill="#c8a8d8" font-family="Georgia,serif" font-style="italic" font-weight="bold">z</text>
+    </svg>
+  </div>
+
+  <!-- iOS "Add to Home Screen" prompt -->
+  <div id="homeScreenPrompt" role="dialog" aria-label="הוסף למסך הבית" style="display:none">
+    <p lang="he">לחוויה מלאה ללא סרגל כתובת:</p>
+    <p>
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="rgba(255,255,255,0.8)" style="vertical-align:middle;margin-left:4px" aria-hidden="true">
+        <path d="M9 1l-3 3h2v6h2V4h2L9 1zm-5 9v5h10v-5h-2v3H6v-3H4z"/>
+      </svg>
+      <span lang="he">לחץ</span> → <strong lang="he">"הוסף למסך הבית"</strong>
+    </p>
+    <button id="homePromptDismiss" aria-label="סגור">✕</button>
+  </div>
+
+  <!-- Parental PIN Modal -->
+  <div id="pinModal" role="dialog" aria-modal="true" aria-labelledby="pinModalTitle">
+    <div class="modal-content">
+      <h2 id="pinModalTitle" lang="he">הגדרות הורים</h2>
+
+      <div id="pinPrompt">
+        <p class="pin-instruction" lang="he">הקש לפי הסדר:</p>
+        <p class="pin-words"><strong lang="en">Eight &middot; Two &middot; Five</strong></p>
+        <div id="pinInput" class="pin-dots" aria-live="polite" aria-label="ספרות שהוזנו"></div>
+        <p id="pinError" class="pin-error" aria-live="assertive" role="alert"></p>
+        <div class="pin-grid" role="group" aria-label="מקלדת PIN">
+          <button class="pin-btn" data-digit="1" aria-label="1">1</button>
+          <button class="pin-btn" data-digit="2" aria-label="2">2</button>
+          <button class="pin-btn" data-digit="3" aria-label="3">3</button>
+          <button class="pin-btn" data-digit="4" aria-label="4">4</button>
+          <button class="pin-btn" data-digit="5" aria-label="5">5</button>
+          <button class="pin-btn" data-digit="6" aria-label="6">6</button>
+          <button class="pin-btn" data-digit="7" aria-label="7">7</button>
+          <button class="pin-btn" data-digit="8" aria-label="8">8</button>
+          <button class="pin-btn" data-digit="9" aria-label="9">9</button>
+          <button class="pin-btn pin-btn-clear" data-digit="-1" aria-label="מחק ספרה אחרונה">&#x232B;</button>
+          <button class="pin-btn" data-digit="0" aria-label="0">0</button>
+          <button class="pin-btn pin-btn-clear" data-digit="-2" aria-label="נקה הכל">&#x2715;</button>
+        </div>
+      </div>
+
+      <div id="configPanel">
+        <div class="session-stats" id="sessionStats" aria-live="polite"></div>
+        <h3 lang="he">משך המשחק</h3>
+        <div class="duration-options" role="group" aria-label="בחר משך משחק">
+          <button class="duration-btn" data-duration="300" aria-label="5 דקות">5 דק׳</button>
+          <button class="duration-btn active" data-duration="600" aria-label="10 דקות">10 דק׳</button>
+          <button class="duration-btn" data-duration="900" aria-label="15 דקות">15 דק׳</button>
+        </div>
+        <button id="viewReportBtn" class="action-btn action-btn-report" aria-label="הצג דוח התפתחות" style="display:none">
+          📊 <span lang="he">דוח התפתחות מהסשן</span>
+        </button>
+        <button id="startGameBtn" class="action-btn action-btn-primary" aria-label="התחל משחק">&#9654; <span lang="he">התחל משחק</span></button>
+        <button id="resetBtn" class="action-btn action-btn-secondary" aria-label="אפס והתחל מחדש">&#x21BA; <span lang="he">אפס / הערות שינה</span></button>
+        <button id="closeModalBtn" class="action-btn action-btn-ghost" aria-label="סגור">
+          <span lang="he">סגור</span>
+        </button>
+        <button id="accessibilityBtn" class="action-btn action-btn-ghost accessibility-link" aria-label="הצהרת נגישות">
+          <span lang="he">הצהרת נגישות</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Parent Development Report -->
+  <div id="parentReport" role="dialog" aria-modal="true" aria-labelledby="reportTitle" style="display:none">
+    <div class="report-content">
+      <div class="report-header">
+        <h2 id="reportTitle" lang="he">דו״ח סיום המשחק</h2>
+        <p class="report-subtitle" lang="en">Session Development Report</p>
+      </div>
+      <div class="report-disclaimer" lang="he" role="note">
+        ⚠️ אינדיקציות בלבד — אינו מהווה אבחון פסיכולוגי מקצועי
+      </div>
+      <div class="report-scores">
+        <div class="score-item">
+          <div class="score-label"><span lang="he">קשב וריכוז</span><span lang="en">Attention</span></div>
+          <div class="score-bar-wrap"><div class="score-bar" id="scoreAttention"></div></div>
+          <div class="score-value" id="scoreAttentionVal"></div>
+        </div>
+        <div class="score-item">
+          <div class="score-label"><span lang="he">מוטוריקה עדינה</span><span lang="en">Fine Motor</span></div>
+          <div class="score-bar-wrap"><div class="score-bar score-bar-motor" id="scoreMotor"></div></div>
+          <div class="score-value" id="scoreMotorVal"></div>
+        </div>
+        <div class="score-item">
+          <div class="score-label"><span lang="he">מעורבות</span><span lang="en">Engagement</span></div>
+          <div class="score-bar-wrap"><div class="score-bar score-bar-engage" id="scoreEngagement"></div></div>
+          <div class="score-value" id="scoreEngagementVal"></div>
+        </div>
+      </div>
+      <div class="report-stats">
+        <div class="stat-box"><span class="stat-num" id="reportPops">0</span><span class="stat-label" lang="he">בועות</span></div>
+        <div class="stat-box"><span class="stat-num" id="reportAccuracy">0%</span><span class="stat-label" lang="he">דיוק</span></div>
+        <div class="stat-box"><span class="stat-num" id="reportStreak">0</span><span class="stat-label" lang="he">רצף שיא</span></div>
+        <div class="stat-box"><span class="stat-num" id="reportDuration">0</span><span class="stat-label" lang="he">דקות</span></div>
+      </div>
+      <div class="report-diagnosis">
+        <h3 lang="he">הערכה התפתחותית משוערת</h3>
+        <p id="reportDiagnosisText" lang="he"></p>
+      </div>
+      <div class="report-footer-disclaimer" lang="he">
+        <strong>חשוב לציין:</strong> מידע זה הינו אינדיקטיבי בלבד ואינו מהווה אבחון פסיכולוגי, רפואי, או חינוכי מוסמך. לאבחון מקצועי פנה לפסיכולוג חינוכי מוסמך.
+      </div>
+      <button id="closeReportBtn" class="action-btn action-btn-primary" aria-label="סגור דוח וחזור">
+        <span lang="he">← חזרה להגדרות</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Accessibility Statement Modal -->
+  <div id="accessibilityModal" role="dialog" aria-modal="true" aria-labelledby="a11yTitle" style="display:none">
+    <div class="modal-content a11y-content">
+      <button id="closeA11yBtn" class="a11y-close-btn" aria-label="סגור הצהרת נגישות">&#x2715;</button>
+      <h2 id="a11yTitle" lang="he">הצהרת נגישות</h2>
+      <p lang="he"><strong>גן הגילוי</strong> מחויב לנגישות דיגיטלית עבור כלל המשתמשים.</p>
+
+      <h3 lang="he">רמת עמידה</h3>
+      <p lang="he">האתר שואף לעמוד בדרישות <strong>תקן ישראלי 5568</strong> ו-<strong>WCAG 2.0 רמה AA</strong>, בהתאם לתקנות שוויון זכויות לאנשים עם מוגבלות (התאמות נגישות לשירות), תשע"ג-2013.</p>
+
+      <h3 lang="he">הנגשות שבוצעו</h3>
+      <ul lang="he">
+        <li>שפת הדף מוגדרת כעברית (<code>lang="he-IL"</code>)</li>
+        <li>כל כפתורי הממשק כוללים תיאורי <code>aria-label</code></li>
+        <li>הודעות שגיאה ועדכונים מוקראים על-ידי קוראי מסך (<code>aria-live</code>)</li>
+        <li>תוכן אנימטיבי מוגבל ל-2.35 הבהובים לשנייה (מתחת לסף WCAG 2.3.1)</li>
+        <li>ניגודיות צבע מינימלית של 4.5:1 בממשק הטקסטואלי</li>
+      </ul>
+
+      <h3 lang="he">חריגות</h3>
+      <p lang="he">תוכן המשחק מוצג על גבי Canvas HTML5 בזמן אמת — חריג מדרישות חלופות מדיה לפי IS 5568 לגבי משחקי מחשב אינטראקטיביים.</p>
+
+      <h3 lang="he">פרטיות</h3>
+      <p lang="he">אפליקציה זו אינה אוספת, מעבדת, או מעבירה כל מידע אישי. אחסון מקומי (localStorage) משמש אך ורק לשמירת הגדרות המשחק במכשיר המשתמש בלבד.</p>
+
+      <h3 lang="he">יצירת קשר — רכז נגישות</h3>
+      <p lang="he">לפניות בנושא נגישות: <a href="mailto:accessibility@gn-gilui.co.il" style="color:#a78bfa">accessibility@gn-gilui.co.il</a></p>
+      <p lang="he">הצהרה זו עודכנה לאחרונה: <time datetime="2026-06-18">יוני 2026</time></p>
+
+      <hr style="border-color:rgba(255,255,255,0.1);margin:16px 0">
+      <p style="font-size:12px;color:rgba(255,255,255,0.4)" lang="en">
+        Accessibility Statement (IS 5568 / WCAG 2.0 AA) · No personal data collected · Last updated June 2026
+      </p>
+    </div>
+  </div>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    }
+  </script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+{
+  "name": "גן הגילוי",
+  "short_name": "Little Wonders",
+  "description": "כל מגע הוא גילוי — Every touch is a discovery",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0a0818",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
