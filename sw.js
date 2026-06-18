@@ -1,6 +1,6 @@
 'use strict';
-const CACHE = 'gn-gilui-v2';
-const ASSETS = ['/', '/index.html', '/css/style.css', '/js/app.js', '/manifest.json'];
+const CACHE = 'gn-gilui-v3';
+const ASSETS = ['/', '/index.html', '/css/style.css', '/js/app.js', '/manifest.json', '/favicon.svg'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));

@@ -202,9 +202,9 @@ canvas, svg {
 }
 
 .pin-dots {
-  font-size: 22px;
-  letter-spacing: 8px;
-  min-height: 32px;
+  font-size: 24px;
+  letter-spacing: 10px;
+  min-height: 34px;
   color: #a78bfa;
   margin-bottom: 8px;
   font-family: monospace;
@@ -689,13 +689,6 @@ canvas, svg {
   50% { opacity: 0.85; transform: scale(1.06); }
 }
 
-/* Celebration — container only, no visible text */
-#celebration {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 30;
-}
 
 /* Accessibility link button */
 .accessibility-link {

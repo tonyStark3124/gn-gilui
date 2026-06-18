@@ -906,8 +906,9 @@ class PeekabooGame {
   init () {
     const types = ['bush', 'blanket', 'cloud'], type = types[Math.floor(Math.random() * types.length)];
     const w = this.canvas.width, h = this.canvas.height;
-    this.blocker = { type, cx: w / 2, cy: h / 2, bw: w * 0.88, bh: h * 0.72, offsetY: 0, targetY: 0, velY: 0 };
+    this.blocker = { type, cx: w / 2, cy: h * 0.59, bw: w * 0.88, bh: h * 0.62, offsetY: 0, targetY: 0, velY: 0 };
     this.revealed = 0; this.sunShakeT = 0; this.sunScale = 0; this.time = 0; this.autoTimer = 0; this.chimePlayed = false;
+    this._tapPulse = 0;
   }
 
   update (dt) {
@@ -923,6 +924,8 @@ class PeekabooGame {
       this.revealed = Math.max(this.revealed - dt * 5, 0); this.sunScale = 0.5 + this.revealed * 0.5;
     }
     if (this.sunShakeT > 0) this.sunShakeT -= dt;
+    // tap-pulse cycle every 2.2s when not revealed
+    if (!isRevealed) this._tapPulse = (this._tapPulse + dt / 2.2) % 1;
   }
 
   draw (ctx) {
@@ -939,6 +942,19 @@ class PeekabooGame {
     if (this.revealed > 0) { ctx.save(); ctx.globalAlpha = this.revealed; this._drawSun(ctx, w / 2, h * 0.33, Math.min(w, h) * 0.22 * this.sunScale); ctx.restore(); }
     else { ctx.save(); ctx.globalAlpha = 0.08; this._drawSun(ctx, w / 2, h * 0.33, Math.min(w, h) * 0.22); ctx.restore(); }
     ctx.save(); ctx.translate(0, b.offsetY); this._drawBlocker(ctx, b); ctx.restore();
+
+    // Tap affordance: pulsing hand above blocker when not yet revealed
+    if (this.revealed < 0.2) {
+      const pulse = Math.sin(this._tapPulse * Math.PI * 2);
+      const handY = b.cy - b.bh / 2 + b.offsetY - 28 + pulse * 10;
+      const alpha = 0.55 + pulse * 0.35;
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, alpha) * (1 - this.revealed * 5);
+      ctx.font = `${Math.round(Math.min(w, h) * 0.085)}px sans-serif`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+      ctx.fillText('👆', w / 2, handY);
+      ctx.restore();
+    }
   }
 
   _drawSun (ctx, cx, cy, r) {
@@ -1012,6 +1028,29 @@ class PaintingGame {
     this.offscreen.width = this.canvas.width; this.offscreen.height = this.canvas.height;
     this.offCtx = this.offscreen.getContext('2d');
     this.offCtx.fillStyle = '#111827'; this.offCtx.fillRect(0, 0, this.offscreen.width, this.offscreen.height);
+    this._drawStarter();
+  }
+
+  _drawStarter () {
+    const o = this.offCtx, w = this.offscreen.width, h = this.offscreen.height;
+    const strokes = [
+      { pts: [[w*0.12,h*0.38],[w*0.28,h*0.28],[w*0.42,h*0.42],[w*0.32,h*0.56]], color: '#FF8E53', lw: 18 },
+      { pts: [[w*0.55,h*0.22],[w*0.72,h*0.34],[w*0.85,h*0.20],[w*0.78,h*0.42]], color: '#87CEEB', lw: 16 },
+      { pts: [[w*0.18,h*0.62],[w*0.36,h*0.70],[w*0.52,h*0.60],[w*0.44,h*0.78]], color: '#DDA0DD', lw: 15 },
+      { pts: [[w*0.60,h*0.58],[w*0.78,h*0.50],[w*0.88,h*0.66],[w*0.72,h*0.76]], color: '#BFFFB5', lw: 17 },
+    ];
+    for (const { pts, color, lw } of strokes) {
+      o.save();
+      o.strokeStyle = color; o.lineWidth = lw; o.lineCap = 'round'; o.lineJoin = 'round';
+      o.shadowBlur = 18; o.shadowColor = color; o.globalAlpha = 0.55;
+      o.beginPath(); o.moveTo(pts[0][0], pts[0][1]);
+      for (let i = 1; i < pts.length - 1; i++) {
+        const mx = (pts[i][0] + pts[i+1][0]) / 2, my = (pts[i][1] + pts[i+1][1]) / 2;
+        o.quadraticCurveTo(pts[i][0], pts[i][1], mx, my);
+      }
+      o.lineTo(pts[pts.length-1][0], pts[pts.length-1][1]);
+      o.stroke(); o.restore();
+    }
   }
 
   _freqForY (y) {
@@ -1214,7 +1253,12 @@ class PINSystem {
     }
   }
 
-  _updateDots () { if (this.pinInput) this.pinInput.textContent = '• '.repeat(this.sequence.length).trim() || ''; }
+  _updateDots () {
+    if (!this.pinInput) return;
+    const filled = '● '.repeat(this.sequence.length);
+    const empty  = '○ '.repeat(PIN_DIGITS.length - this.sequence.length);
+    this.pinInput.textContent = (filled + empty).trim();
+  }
 
   _success () {
     this.sequence = []; this._updateDots();
@@ -1240,11 +1284,12 @@ class PINSystem {
   }
 
   show () {
-    this.sequence = []; this._updateDots();
+    this.sequence = [];
     if (this.pinError)    this.pinError.textContent = '';
     if (this.pinPrompt)   this.pinPrompt.style.display = 'block';
     if (this.configPanel) this.configPanel.style.display = 'none';
     if (this.modal) { this.modal.style.display = 'flex'; this.modal.classList.add('visible'); }
+    this._updateDots();
   }
 
   hide () { if (this.modal) { this.modal.style.display = 'none'; this.modal.classList.remove('visible'); } }
@@ -1366,7 +1411,11 @@ class App {
     let dismissed = false;
     try { dismissed = !!localStorage.getItem('gnGilui_hsPrompt'); } catch (_) {}
     if (isIOS && !isStandalone && !dismissed) {
-      setTimeout(() => { const p = document.getElementById('homeScreenPrompt'); if (p) p.style.display = 'block'; }, 5000);
+      setTimeout(() => {
+        if (this.state !== STATE.LOCKED_PIN) return;
+        const p = document.getElementById('homeScreenPrompt');
+        if (p) p.style.display = 'block';
+      }, 5000);
     }
   }
 
