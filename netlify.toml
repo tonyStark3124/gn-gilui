@@ -1,5 +1,9 @@
 [build]
+  command = ""
   publish = "."
+
+[build.environment]
+  NETLIFY_SKIP_FRAMEWORK_DETECTION = "true"
 
 [[headers]]
   for = "/*"
