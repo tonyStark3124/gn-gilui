@@ -40,6 +40,7 @@ export class GameEngine {
 
   // Wind-down
   private windDownStart = 0;
+  private lullabyStarted = false;
 
   // Interaction
   private interactionCount = 0;
@@ -91,6 +92,7 @@ export class GameEngine {
     this.sessionStart = performance.now();
     this.interactionCount = 0;
     this.paintingSessionCount = 0;
+    this.lullabyStarted = false;
     this.paused = false;
     this.devTracker.startSession();
     this.cb.onPausedChange(false);
@@ -236,7 +238,8 @@ export class GameEngine {
         const cutoff = 200 + p * 3800;
         this.canvas.style.filter = `saturate(${0.3 + p * 0.7})`;
         this.sound.setLowPassCutoff(cutoff);
-        if (this.windFactor <= 0.26 && this.state !== GameState.WIND_DOWN) {
+        if (this.windFactor <= 0.26 && !this.lullabyStarted) {
+          this.lullabyStarted = true;
           this.sound.startLullaby();
         }
       }

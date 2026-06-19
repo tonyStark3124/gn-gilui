@@ -46,7 +46,7 @@ export class PeekabooGame {
     this.hintPulse = 0;
   }
 
-  update(dt: number, windFactor: number, now: number): void {
+  update(dt: number, windFactor: number, _now: number): void {
     const h = this.canvas.height;
 
     this.eyeTimer -= dt;

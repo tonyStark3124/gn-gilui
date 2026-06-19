@@ -43,7 +43,7 @@ export class PaintingGame {
     }
   }
 
-  update(_dt: number, windFactor: number, _now: number): void {
+  update(_dt: number, _windFactor: number, _now: number): void {
     this.pool.update();
   }
 

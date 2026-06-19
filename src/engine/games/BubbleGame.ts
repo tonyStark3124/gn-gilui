@@ -276,7 +276,7 @@ export class BubbleGame {
     ctx.restore();
   }
 
-  private _drawSurprise(ctx: CanvasRenderingContext2D, s: SurpriseBubble, now: number): void {
+  private _drawSurprise(ctx: CanvasRenderingContext2D, s: SurpriseBubble, _now: number): void {
     const hueGrad = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r);
     const h1 = s.rainbowAngle;
     hueGrad.addColorStop(0, `hsla(${h1},100%,80%,0.25)`);

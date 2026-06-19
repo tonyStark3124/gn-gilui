@@ -1,4 +1,4 @@
-import { PENTATONIC, PENTATONIC_HIGH } from '@/engine/constants';
+import { PENTATONIC_HIGH } from '@/engine/constants';
 
 export class SoundEngine {
   private ctx: AudioContext | null = null;
