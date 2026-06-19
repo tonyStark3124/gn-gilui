@@ -1,11 +1,4 @@
-src/
-package.json
-package-lock.json
-node_modules/
-next.config.ts
-tsconfig.json
-postcss.config.mjs
-.eslintrc.json
 CLAUDE.md
 .gitignore
 .git/
+.claude/
