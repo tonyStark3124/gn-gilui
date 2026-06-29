@@ -1,6 +1,6 @@
 # גן הגילוי 🌱
 
-> Built in an afternoon with Claude Code. My daughter is now addicted. Parenting win.
+> Built in an afternoon. My daughter is now addicted. Parenting win.
 
 An educational PWA for toddlers (ages 1–3). Every tap is a discovery — animals, sounds, colors, shapes. No ads, no accounts, no dark patterns. Just a child and a screen doing something vaguely useful.
 
